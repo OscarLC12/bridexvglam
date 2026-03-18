@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react'
 import { motion, type Variants } from 'framer-motion'
 import {
   Instagram,
@@ -15,80 +16,446 @@ import promoPhoto from './assets/5.png'
 import weddingStreet from './assets/6.png'
 import bridePhone from './assets/7.png'
 
-const packages = [
-  {
-    title: 'Paquete Básico',
-    subtitle: 'Maquillaje Social',
-    price: '$150',
-    icon: 'M',
-    description:
-      'Ideal para eventos especiales con un look elegante, fresco y duradero.',
-    features: [
-      'Maquillaje social personalizado según tu estilo.',
-      'Acabado elegante y natural.',
-      'Preparación de piel para mejor duración.',
-      'Fijación para que luzcas impecable durante tu evento.',
-    ],
-  },
-  {
-    title: 'Paquete Intermedio',
-    subtitle: 'Glam',
-    price: '$170',
-    icon: 'G',
-    description:
-      'Perfecto para quienes buscan un look más definido, glamoroso y sofisticado.',
-    features: [
-      'Maquillaje glam con mayor definición.',
-      'Técnicas de contorno e iluminación.',
-      'Asesoría en elección de tonos según tu evento.',
-      'Fijador de maquillaje profesional para mayor duración.',
-    ],
-    highlighted: true,
-  },
-  {
-    title: 'Paquete Premium',
-    subtitle: 'VIP',
-    price: '$200',
-    icon: 'V',
-    description:
-      'Una experiencia más completa para lucir espectacular en tu día especial.',
-    features: [
-      'Preparación completa de piel.',
-      'Maquillaje premium de larga duración.',
-      'Acabado de alta definición ideal para foto y video.',
-      'Toques finales de iluminación y perfeccionamiento.',
-      'Atención más personalizada para tu look final.',
-    ],
-  },
-]
+type Language = 'en' | 'es'
 
-const gallery = [
-  {
-    image: quincePhoto,
-    title: 'Bridal elegance',
-    text: 'Un look de novia elegante, romántico y cuidadosamente diseñado para un acabado inolvidable.',
+const translations = {
+  en: {
+    nav: {
+      home: 'Home',
+      experience: 'Experience',
+      services: 'Services',
+      gallery: 'Gallery',
+      packages: 'Packages',
+      contact: 'Contact',
+      book: 'Book Now',
+    },
+    header: {
+      location: 'Las Vegas, Nevada',
+      role: 'Hair and Makeup Artist',
+    },
+    hero: {
+      badge: 'Hair and Makeup Artist · Brides · Quinceañeras',
+      eyebrow: 'Glamour for Brides and Quinceañeras',
+      titleLine2: 'Hair and Makeup Artist',
+      description:
+        'An elegant, feminine and glamorous concept for brides and quinceañeras in Las Vegas. We create unforgettable looks with a luxury visual presence, designed for photography, video and your special event.',
+      viewPackages: 'View Packages',
+      viewGallery: 'View Gallery',
+    },
+    topCards: {
+      styleLabel: 'Style',
+      styleTitle1: 'Editorial',
+      styleTitle2: 'Elegance',
+      styleText:
+        'An image designed to convey luxury, harmony and an unforgettable presence from every angle.',
+      specialtyLabel: 'Specialty',
+      specialtyValue: 'Brides · XV · Premium glam',
+      hairStyling: 'Hair Styling',
+      hairStylingText: 'Elegant hairstyles and finishes with a luxury presence.',
+      makeupGlam: 'Makeup Glam',
+      makeupGlamText: 'Glamorous, feminine and memorable looks for your event.',
+      locationLabel: 'Location',
+      locationTitle1: 'Las Vegas,',
+      locationTitle2: 'Nevada',
+      locationText:
+        'A sophisticated visual experience for special events with a feminine, modern and premium identity.',
+      addressLabel: 'Address',
+      addressValue: '2202 E Charleston Blvd',
+    },
+    experience: {
+      badge: 'The experience',
+      title: 'More than hair and makeup, a complete presence.',
+      text:
+        'The ideal image for your event should not only look beautiful: it should feel luxurious, harmonious and designed so you look spectacular from every angle.',
+      items: [
+        {
+          number: '01',
+          title: 'Visual consulting',
+          text: 'We define a look that matches your dress, accessories and essence.',
+        },
+        {
+          number: '02',
+          title: 'Premium finish',
+          text: 'Techniques that enhance photography, video, lighting and long wear.',
+        },
+        {
+          number: '03',
+          title: 'Memorable result',
+          text: 'An elegant, glamorous and high-impact look for your big day.',
+        },
+      ],
+    },
+    services: {
+      badge: 'Services',
+      title: 'A service designed to highlight beauty, luxury and femininity.',
+      items: [
+        {
+          icon: 'B',
+          label: 'Bridal Glam',
+          title: 'Brides',
+          text: 'Sophisticated hair and makeup for a refined, elegant and luminous image.',
+          footer: 'Timeless elegance',
+          special: false,
+        },
+        {
+          icon: 'XV',
+          label: 'XV Glam',
+          title: 'Quinceañeras',
+          text: 'Glamorous, youthful and delicate looks to shine with an unforgettable image.',
+          footer: 'Modern glamour',
+          special: true,
+        },
+        {
+          icon: 'M',
+          label: 'Hair and Makeup',
+          title: 'Makeup',
+          text: 'Professional techniques for radiant skin and a flawless high-end finish.',
+          footer: 'Premium finish',
+          special: false,
+        },
+      ],
+    },
+    gallerySection: {
+      badge: 'Gallery',
+      title: 'Visual inspiration for brides and quinceañeras.',
+      text:
+        'A selection of styles, hairstyles and moments that reflect the elegant, feminine and glamorous essence of the brand.',
+      ctaBadge: 'Hair and Makeup Artist',
+      ctaTitle: 'Professional makeup and hairstyles with a premium finish.',
+      ctaText:
+        'A style designed to project glamour, elegance and confidence at every special event.',
+      ctaButton: 'Book your appointment',
+      items: [
+        {
+          title: 'Bridal elegance',
+          text: 'An elegant, romantic bridal look carefully designed for an unforgettable finish.',
+        },
+        {
+          title: 'Timeless beauty',
+          text: 'A classic, delicate and memorable look for your special day.',
+        },
+        {
+          title: 'Bridal hairstyle',
+          text: 'Texture, volume and a sophisticated finish to complement a luxury bridal look.',
+        },
+        {
+          title: 'Beauty styling',
+          text: 'Modern and refined hairstyles for photoshoots, events and celebrations.',
+        },
+        {
+          title: 'Bridal preparation',
+          text: 'Moments before the big day with elegant, feminine and premium styling.',
+        },
+      ],
+    },
+    packagesSection: {
+      badge: 'Packages',
+      title: 'Choose the perfect experience for your event.',
+      text:
+        'Each package is designed so you can enjoy a sophisticated, feminine and long-lasting look created to highlight your beauty in every special moment.',
+      note:
+        'Important note: Prices shown do not include transportation or parking fees if required. These costs are quoted separately depending on the event location.',
+      finalText:
+        '✨ Make every moment shine. Book your appointment today and look spectacular at your special event. ✨',
+      reserve: 'Book package',
+      items: [
+        {
+          title: 'Basic Package',
+          subtitle: 'Social Makeup',
+          price: '$150',
+          icon: 'M',
+          description:
+            'Ideal for special events with an elegant, fresh and long-lasting look.',
+          features: [
+            'Personalized social makeup according to your style.',
+            'Elegant and natural finish.',
+            'Skin preparation for better wear.',
+            'Setting for a flawless look throughout your event.',
+          ],
+        },
+        {
+          title: 'Intermediate Package',
+          subtitle: 'Glam',
+          price: '$170',
+          icon: 'G',
+          description:
+            'Perfect for those who want a more defined, glamorous and sophisticated look.',
+          features: [
+            'Glam makeup with greater definition.',
+            'Contouring and highlighting techniques.',
+            'Advice on choosing tones according to your event.',
+            'Professional setting spray for longer wear.',
+          ],
+          highlighted: true,
+        },
+        {
+          title: 'Premium Package',
+          subtitle: 'VIP',
+          price: '$200',
+          icon: 'V',
+          description:
+            'A more complete experience to look spectacular on your special day.',
+          features: [
+            'Complete skin preparation.',
+            'Premium long-lasting makeup.',
+            'High-definition finish ideal for photo and video.',
+            'Final touches of highlight and refinement.',
+            'More personalized attention for your final look.',
+          ],
+        },
+      ],
+    },
+    contact: {
+      badge: 'Contact',
+      title: 'Book your date and make your image a true star too.',
+      text:
+        'Contact us directly through WhatsApp, phone call or social media to get a quote for your event, check availability and reserve your date.',
+      location: 'Location:',
+      instagram: 'Instagram:',
+      facebook: 'Facebook:',
+      whatsapp: 'WhatsApp:',
+      calls: 'Calls:',
+      important: 'Important:',
+      importantText:
+        'Does not include transportation or parking fees if required.',
+      cardBadge: 'Request information',
+      cardTitle: 'Talk to us directly',
+      cardText:
+        'Choose your preferred contact method to receive faster assistance.',
+      whatsappButton: 'Send WhatsApp message',
+      callButton: 'Make a call',
+      directBadge: 'Direct assistance',
+      directText:
+        'Book your appointment, ask about packages and confirm availability quickly through WhatsApp, calls or social media.',
+    },
+    footer: {
+      role: 'Hair and Makeup Artist',
+      rights: '© 2026 All rights reserved.',
+    },
+    language: {
+      english: 'English',
+      spanish: 'Español',
+    },
   },
-  {
-    image: weddingStreet,
-    title: 'Timeless beauty',
-    text: 'Un look clásico, delicado y memorable para tu día especial.',
+  es: {
+    nav: {
+      home: 'Inicio',
+      experience: 'Experiencia',
+      services: 'Servicios',
+      gallery: 'Galería',
+      packages: 'Paquetes',
+      contact: 'Contacto',
+      book: 'Reserva',
+    },
+    header: {
+      location: 'Las Vegas, Nevada',
+      role: 'Hair and Makeup Artist',
+    },
+    hero: {
+      badge: 'Hair and Makeup Artist · Brides · Quinceañeras',
+      eyebrow: 'Glamour para Novias y Quinceañeras',
+      titleLine2: 'Hair and Makeup Artist',
+      description:
+        'Un concepto elegante, femenino y glamoroso para novias y quinceañeras en Las Vegas. Creamos looks inolvidables con una presencia visual de lujo, pensada para fotografía, video y el gran evento.',
+      viewPackages: 'Ver paquetes',
+      viewGallery: 'Ver galería',
+    },
+    topCards: {
+      styleLabel: 'Estilo',
+      styleTitle1: 'Elegancia',
+      styleTitle2: 'editorial',
+      styleText:
+        'Una imagen diseñada para transmitir lujo, armonía y una presencia inolvidable desde cada ángulo.',
+      specialtyLabel: 'Especialidad',
+      specialtyValue: 'Novias · XV · Glam premium',
+      hairStyling: 'Hair Styling',
+      hairStylingText: 'Peinados elegantes y acabados con presencia de lujo.',
+      makeupGlam: 'Makeup Glam',
+      makeupGlamText: 'Looks glamorosos, femeninos y memorables para tu evento.',
+      locationLabel: 'Ubicación',
+      locationTitle1: 'Las Vegas,',
+      locationTitle2: 'Nevada',
+      locationText:
+        'Una experiencia visual sofisticada para eventos especiales con una identidad femenina, moderna y premium.',
+      addressLabel: 'Dirección',
+      addressValue: '2202 E Charleston Blvd',
+    },
+    experience: {
+      badge: 'La experiencia',
+      title: 'Más que peinado y maquillaje, una presencia completa.',
+      text:
+        'La imagen ideal para tu evento no solo debe verse bonita: debe sentirse lujosa, armónica y pensada para que luzcas espectacular desde cada ángulo.',
+      items: [
+        {
+          number: '01',
+          title: 'Asesoría visual',
+          text: 'Definimos un look acorde a tu vestido, accesorios y esencia.',
+        },
+        {
+          number: '02',
+          title: 'Acabado premium',
+          text: 'Técnicas que favorecen fotografía, video, iluminación y duración.',
+        },
+        {
+          number: '03',
+          title: 'Resultado memorable',
+          text: 'Un look elegante, glamoroso y de alto impacto para tu gran día.',
+        },
+      ],
+    },
+    services: {
+      badge: 'Servicios',
+      title: 'Un servicio pensado para resaltar belleza, lujo y feminidad.',
+      items: [
+        {
+          icon: 'B',
+          label: 'Bridal Glam',
+          title: 'Novias',
+          text: 'Peinado y maquillaje sofisticado para una imagen refinada, elegante y luminosa.',
+          footer: 'Elegancia atemporal',
+          special: false,
+        },
+        {
+          icon: 'XV',
+          label: 'XV Glam',
+          title: 'Quinceañeras',
+          text: 'Looks glamorosos, juveniles y delicados para brillar con una imagen inolvidable.',
+          footer: 'Glamour moderno',
+          special: true,
+        },
+        {
+          icon: 'M',
+          label: 'Hair and Makeup',
+          title: 'Maquillaje',
+          text: 'Técnicas profesionales para una piel luminosa y un acabado impecable de alto nivel.',
+          footer: 'Acabado premium',
+          special: false,
+        },
+      ],
+    },
+    gallerySection: {
+      badge: 'Galería',
+      title: 'Inspiración visual para novias y quinceañeras.',
+      text:
+        'Una selección de estilos, peinados y momentos que reflejan la esencia elegante, femenina y glamorosa de la marca.',
+      ctaBadge: 'Hair and Makeup Artist',
+      ctaTitle: 'Maquillaje y peinados profesionales con acabado premium.',
+      ctaText:
+        'Un estilo diseñado para proyectar glamour, elegancia y seguridad en cada evento especial.',
+      ctaButton: 'Agenda tu cita',
+      items: [
+        {
+          title: 'Bridal elegance',
+          text: 'Un look de novia elegante, romántico y cuidadosamente diseñado para un acabado inolvidable.',
+        },
+        {
+          title: 'Timeless beauty',
+          text: 'Un look clásico, delicado y memorable para tu día especial.',
+        },
+        {
+          title: 'Peinado de novia',
+          text: 'Textura, volumen y un acabado sofisticado para complementar un look nupcial de lujo.',
+        },
+        {
+          title: 'Beauty styling',
+          text: 'Peinados modernos y refinados para sesiones, eventos y celebraciones.',
+        },
+        {
+          title: 'Bridal preparation',
+          text: 'Momentos previos al gran día con un styling elegante, femenino y premium.',
+        },
+      ],
+    },
+    packagesSection: {
+      badge: 'Paquetes',
+      title: 'Elige la experiencia perfecta para tu evento.',
+      text:
+        'Diseñamos cada paquete para que disfrutes un look sofisticado, femenino y duradero, pensado para resaltar tu belleza en cada momento especial.',
+      note:
+        'Nota importante: Los precios mostrados no incluyen gastos de transporte ni parking en caso de ser requeridos. Estos costos se cotizan por separado según la ubicación del evento.',
+      finalText:
+        '✨ Haz que cada momento brille. Agenda tu cita hoy y luce espectacular en tu evento especial. ✨',
+      reserve: 'Reservar paquete',
+      items: [
+        {
+          title: 'Paquete Básico',
+          subtitle: 'Maquillaje Social',
+          price: '$150',
+          icon: 'M',
+          description:
+            'Ideal para eventos especiales con un look elegante, fresco y duradero.',
+          features: [
+            'Maquillaje social personalizado según tu estilo.',
+            'Acabado elegante y natural.',
+            'Preparación de piel para mejor duración.',
+            'Fijación para que luzcas impecable durante tu evento.',
+          ],
+        },
+        {
+          title: 'Paquete Intermedio',
+          subtitle: 'Glam',
+          price: '$170',
+          icon: 'G',
+          description:
+            'Perfecto para quienes buscan un look más definido, glamoroso y sofisticado.',
+          features: [
+            'Maquillaje glam con mayor definición.',
+            'Técnicas de contorno e iluminación.',
+            'Asesoría en elección de tonos según tu evento.',
+            'Fijador de maquillaje profesional para mayor duración.',
+          ],
+          highlighted: true,
+        },
+        {
+          title: 'Paquete Premium',
+          subtitle: 'VIP',
+          price: '$200',
+          icon: 'V',
+          description:
+            'Una experiencia más completa para lucir espectacular en tu día especial.',
+          features: [
+            'Preparación completa de piel.',
+            'Maquillaje premium de larga duración.',
+            'Acabado de alta definición ideal para foto y video.',
+            'Toques finales de iluminación y perfeccionamiento.',
+            'Atención más personalizada para tu look final.',
+          ],
+        },
+      ],
+    },
+    contact: {
+      badge: 'Contacto',
+      title: 'Reserva tu fecha y haz que tu imagen también sea protagonista.',
+      text:
+        'Contáctanos directamente por WhatsApp, llamada o redes sociales para cotizar tu evento, revisar disponibilidad y apartar tu fecha.',
+      location: 'Ubicación:',
+      instagram: 'Instagram:',
+      facebook: 'Facebook:',
+      whatsapp: 'WhatsApp:',
+      calls: 'Llamadas:',
+      important: 'Importante:',
+      importantText:
+        'No incluye gastos de transporte ni parking en caso de ser requeridos.',
+      cardBadge: 'Solicita información',
+      cardTitle: 'Habla con nosotros directamente',
+      cardText:
+        'Elige la forma de contacto que prefieras para recibir atención más rápida.',
+      whatsappButton: 'Enviar mensaje por WhatsApp',
+      callButton: 'Hacer una llamada',
+      directBadge: 'Atención directa',
+      directText:
+        'Agenda tu cita, consulta paquetes y confirma disponibilidad de forma rápida por WhatsApp, llamada o redes sociales.',
+    },
+    footer: {
+      role: 'Hair and Makeup Artist',
+      rights: '© 2026 Todos los derechos reservados.',
+    },
+    language: {
+      english: 'English',
+      spanish: 'Español',
+    },
   },
-  {
-    image: curlsBack,
-    title: 'Peinado de novia',
-    text: 'Textura, volumen y un acabado sofisticado para complementar un look nupcial de lujo.',
-  },
-  {
-    image: ponytailPhoto,
-    title: 'Beauty styling',
-    text: 'Peinados modernos y refinados para sesiones, eventos y celebraciones.',
-  },
-  {
-    image: bridePhone,
-    title: 'Bridal preparation',
-    text: 'Momentos previos al gran día con un styling elegante, femenino y premium.',
-  },
-]
+} as const
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 32 },
@@ -117,6 +484,40 @@ const zoomSoft: Variants = {
 }
 
 function App() {
+  const [language, setLanguage] = useState<Language>('en')
+  const t = useMemo(() => translations[language], [language])
+
+  const gallery = [
+    {
+      image: quincePhoto,
+      title: t.gallerySection.items[0].title,
+      text: t.gallerySection.items[0].text,
+    },
+    {
+      image: weddingStreet,
+      title: t.gallerySection.items[1].title,
+      text: t.gallerySection.items[1].text,
+    },
+    {
+      image: curlsBack,
+      title: t.gallerySection.items[2].title,
+      text: t.gallerySection.items[2].text,
+    },
+    {
+      image: ponytailPhoto,
+      title: t.gallerySection.items[3].title,
+      text: t.gallerySection.items[3].text,
+    },
+    {
+      image: bridePhone,
+      title: t.gallerySection.items[4].title,
+      text: t.gallerySection.items[4].text,
+    },
+  ]
+
+  const packages = t.packagesSection.items
+  const services = t.services.items
+
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#050507] text-[#f8f2ea] selection:bg-[#c6a664] selection:text-black">
       <div className="pointer-events-none fixed inset-0 -z-10">
@@ -178,13 +579,13 @@ function App() {
               />
               <div className="leading-tight">
                 <p className="text-[10px] uppercase tracking-[0.34em] text-[#c6a664]">
-                  Las Vegas, Nevada
+                  {t.header.location}
                 </p>
                 <h1 className="text-sm font-medium text-[#fff8f0] md:text-base">
                   Luz Cervantes
                 </h1>
                 <p className="text-[11px] text-[#d7c9b3] md:text-xs">
-                  Hair and Makeup Artist
+                  {t.header.role}
                 </p>
               </div>
             </div>
@@ -192,26 +593,49 @@ function App() {
 
           <nav className="hidden items-center gap-7 lg:flex">
             <a href="#inicio" className="text-sm text-[#f6eee4] transition duration-300 hover:text-[#ffd700]">
-              Inicio
+              {t.nav.home}
             </a>
             <a href="#experiencia" className="text-sm text-[#f6eee4] transition duration-300 hover:text-[#ffd700]">
-              Experiencia
+              {t.nav.experience}
             </a>
             <a href="#servicios" className="text-sm text-[#f6eee4] transition duration-300 hover:text-[#ffd700]">
-              Servicios
+              {t.nav.services}
             </a>
             <a href="#galeria" className="text-sm text-[#f6eee4] transition duration-300 hover:text-[#ffd700]">
-              Galería
+              {t.nav.gallery}
             </a>
             <a href="#paquetes" className="text-sm text-[#f6eee4] transition duration-300 hover:text-[#ffd700]">
-              Paquetes
+              {t.nav.packages}
             </a>
             <a href="#contacto" className="text-sm text-[#f6eee4] transition duration-300 hover:text-[#ffd700]">
-              Contacto
+              {t.nav.contact}
             </a>
           </nav>
 
           <div className="flex items-center gap-2">
+            <div className="hidden rounded-full border border-[#c6a664]/20 bg-black/40 p-1 md:flex">
+              <button
+                onClick={() => setLanguage('en')}
+                className={`rounded-full px-3 py-2 text-xs font-medium transition ${
+                  language === 'en'
+                    ? 'bg-[#c6a664] text-black'
+                    : 'text-[#f8f2ea] hover:text-[#ffd700]'
+                }`}
+              >
+                {t.language.english}
+              </button>
+              <button
+                onClick={() => setLanguage('es')}
+                className={`rounded-full px-3 py-2 text-xs font-medium transition ${
+                  language === 'es'
+                    ? 'bg-[#c6a664] text-black'
+                    : 'text-[#f8f2ea] hover:text-[#ffd700]'
+                }`}
+              >
+                {t.language.spanish}
+              </button>
+            </div>
+
             <a
               href="https://www.instagram.com/bridexvglam/"
               target="_blank"
@@ -234,10 +658,35 @@ function App() {
               href="#contacto"
               className="rounded-full border border-[#c6a664] px-5 py-2.5 text-sm font-medium text-[#f8f2ea] transition duration-300 hover:scale-[1.04] hover:bg-[#c6a664] hover:text-black"
             >
-              Reserva
+              {t.nav.book}
             </a>
           </div>
         </motion.div>
+
+        <div className="mx-auto mt-3 flex max-w-7xl justify-center md:hidden">
+          <div className="rounded-full border border-[#c6a664]/20 bg-black/40 p-1">
+            <button
+              onClick={() => setLanguage('en')}
+              className={`rounded-full px-3 py-2 text-xs font-medium transition ${
+                language === 'en'
+                  ? 'bg-[#c6a664] text-black'
+                  : 'text-[#f8f2ea] hover:text-[#ffd700]'
+              }`}
+            >
+              {t.language.english}
+            </button>
+            <button
+              onClick={() => setLanguage('es')}
+              className={`rounded-full px-3 py-2 text-xs font-medium transition ${
+                language === 'es'
+                  ? 'bg-[#c6a664] text-black'
+                  : 'text-[#f8f2ea] hover:text-[#ffd700]'
+              }`}
+            >
+              {t.language.spanish}
+            </button>
+          </div>
+        </div>
       </header>
 
       <section
@@ -267,7 +716,7 @@ function App() {
             custom={0.1}
             className="relative z-10 mx-auto mb-8 w-fit rounded-full border border-[#c6a664]/20 bg-white/[0.03] px-5 py-2 text-sm text-[#f7e7ce] shadow-[0_0_30px_rgba(198,166,100,0.10)]"
           >
-            Hair and Makeup Artist · Brides · Quinceañeras
+            {t.hero.badge}
           </motion.div>
 
           <motion.p
@@ -277,7 +726,7 @@ function App() {
             custom={0.2}
             className="relative z-10 mb-5 text-xs uppercase tracking-[0.42em] text-[#c6a664] md:text-sm"
           >
-            Glamour para Novias y Quinceañeras
+            {t.hero.eyebrow}
           </motion.p>
 
           <motion.h2
@@ -290,7 +739,7 @@ function App() {
             Luz Cervantes
             <br className="hidden md:block" />
             <span className="inline-block bg-gradient-to-r from-[#fff8f0] via-[#f7e7ce] to-[#c6a664] bg-clip-text text-transparent">
-              Hair and Makeup Artist
+              {t.hero.titleLine2}
             </span>
           </motion.h2>
 
@@ -301,9 +750,7 @@ function App() {
             custom={0.45}
             className="relative z-10 mx-auto mt-8 max-w-3xl text-base leading-8 text-[#d8cdbf] md:text-lg"
           >
-            Un concepto elegante, femenino y glamoroso para novias y quinceañeras en
-            Las Vegas. Creamos looks inolvidables con una presencia visual de lujo,
-            pensada para fotografía, video y el gran evento.
+            {t.hero.description}
           </motion.p>
 
           <motion.div
@@ -317,13 +764,13 @@ function App() {
               href="#paquetes"
               className="rounded-full bg-[#c6a664] px-8 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-black shadow-[0_10px_30px_rgba(198,166,100,0.25)] transition duration-300 hover:scale-[1.04] hover:bg-[#ffd700]"
             >
-              Ver paquetes
+              {t.hero.viewPackages}
             </a>
             <a
               href="#galeria"
               className="rounded-full border border-[#f7e7ce]/20 px-8 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-[#f8f2ea] transition duration-300 hover:scale-[1.04] hover:border-[#ffd700] hover:text-[#ffd700]"
             >
-              Ver galería
+              {t.hero.viewGallery}
             </a>
           </motion.div>
         </div>
@@ -339,25 +786,24 @@ function App() {
           >
             <div>
               <p className="mb-3 text-xs uppercase tracking-[0.32em] text-[#c6a664]">
-                Estilo
+                {t.topCards.styleLabel}
               </p>
               <h3 className="text-3xl font-semibold text-[#fff7ef]">
-                Elegancia
+                {t.topCards.styleTitle1}
                 <br />
-                editorial
+                {t.topCards.styleTitle2}
               </h3>
               <p className="mt-5 leading-8 text-[#d5cab9]">
-                Una imagen diseñada para transmitir lujo, armonía y una presencia
-                inolvidable desde cada ángulo.
+                {t.topCards.styleText}
               </p>
             </div>
 
             <div className="mt-8 border-t border-[#c6a664]/12 pt-6">
               <p className="text-xs uppercase tracking-[0.3em] text-[#c6a664]">
-                Especialidad
+                {t.topCards.specialtyLabel}
               </p>
               <p className="mt-3 text-lg text-[#f1e7da]">
-                Novias · XV · Glam premium
+                {t.topCards.specialtyValue}
               </p>
             </div>
           </motion.div>
@@ -384,19 +830,19 @@ function App() {
               <div className="mt-5 grid gap-4 md:grid-cols-2">
                 <div className="rounded-2xl border border-[#c6a664]/12 bg-black/30 p-4 transition duration-300 hover:border-[#c6a664]/30">
                   <p className="text-[11px] uppercase tracking-[0.28em] text-[#c6a664]">
-                    Hair Styling
+                    {t.topCards.hairStyling}
                   </p>
                   <p className="mt-2 text-sm leading-7 text-[#eadfcf]">
-                    Peinados elegantes y acabados con presencia de lujo.
+                    {t.topCards.hairStylingText}
                   </p>
                 </div>
 
                 <div className="rounded-2xl border border-[#c6a664]/12 bg-black/30 p-4 transition duration-300 hover:border-[#c6a664]/30">
                   <p className="text-[11px] uppercase tracking-[0.28em] text-[#c6a664]">
-                    Makeup Glam
+                    {t.topCards.makeupGlam}
                   </p>
                   <p className="mt-2 text-sm leading-7 text-[#eadfcf]">
-                    Looks glamorosos, femeninos y memorables para tu evento.
+                    {t.topCards.makeupGlamText}
                   </p>
                 </div>
               </div>
@@ -413,25 +859,24 @@ function App() {
           >
             <div>
               <p className="mb-3 text-xs uppercase tracking-[0.32em] text-[#c6a664]">
-                Ubicación
+                {t.topCards.locationLabel}
               </p>
               <h3 className="text-3xl font-semibold text-[#fff7ef]">
-                Las Vegas,
+                {t.topCards.locationTitle1}
                 <br />
-                Nevada
+                {t.topCards.locationTitle2}
               </h3>
               <p className="mt-5 leading-8 text-[#d5cab9]">
-                Una experiencia visual sofisticada para eventos especiales con una
-                identidad femenina, moderna y premium.
+                {t.topCards.locationText}
               </p>
             </div>
 
             <div className="mt-8 border-t border-[#c6a664]/12 pt-6">
               <p className="text-xs uppercase tracking-[0.3em] text-[#c6a664]">
-                Dirección
+                {t.topCards.addressLabel}
               </p>
               <p className="mt-3 text-lg text-[#f1e7da]">
-                2202 E Charleston Blvd
+                {t.topCards.addressValue}
               </p>
             </div>
           </motion.div>
@@ -450,35 +895,18 @@ function App() {
           <div className="grid lg:grid-cols-[0.95fr_1.05fr]">
             <div className="border-b border-[#c6a664]/10 p-8 lg:border-b-0 lg:border-r lg:p-12">
               <p className="text-xs uppercase tracking-[0.35em] text-[#c6a664]">
-                La experiencia
+                {t.experience.badge}
               </p>
               <h3 className="mt-4 text-3xl font-semibold text-[#fff8f0] md:text-4xl">
-                Más que peinado y maquillaje, una presencia completa.
+                {t.experience.title}
               </h3>
               <p className="mt-5 max-w-xl leading-8 text-[#d6cab9]">
-                La imagen ideal para tu evento no solo debe verse bonita: debe sentirse
-                lujosa, armónica y pensada para que luzcas espectacular desde cada ángulo.
+                {t.experience.text}
               </p>
             </div>
 
             <div className="grid gap-px bg-[#c6a664]/10 md:grid-cols-3">
-              {[
-                {
-                  number: '01',
-                  title: 'Asesoría visual',
-                  text: 'Definimos un look acorde a tu vestido, accesorios y esencia.',
-                },
-                {
-                  number: '02',
-                  title: 'Acabado premium',
-                  text: 'Técnicas que favorecen fotografía, video, iluminación y duración.',
-                },
-                {
-                  number: '03',
-                  title: 'Resultado memorable',
-                  text: 'Un look elegante, glamoroso y de alto impacto para tu gran día.',
-                },
-              ].map((item, index) => (
+              {t.experience.items.map((item, index) => (
                 <motion.div
                   key={index}
                   variants={fadeUp}
@@ -507,39 +935,14 @@ function App() {
           custom={0.1}
           className="mb-14 max-w-3xl"
         >
-          <p className="text-xs uppercase tracking-[0.35em] text-[#c6a664]">Servicios</p>
+          <p className="text-xs uppercase tracking-[0.35em] text-[#c6a664]">{t.services.badge}</p>
           <h3 className="mt-4 text-4xl font-semibold text-[#fff8f0] md:text-5xl">
-            Un servicio pensado para resaltar belleza, lujo y feminidad.
+            {t.services.title}
           </h3>
         </motion.div>
 
         <div className="grid gap-6 lg:grid-cols-3">
-          {[
-            {
-              icon: 'B',
-              label: 'Bridal Glam',
-              title: 'Novias',
-              text: 'Peinado y maquillaje sofisticado para una imagen refinada, elegante y luminosa.',
-              footer: 'Elegancia atemporal',
-              special: false,
-            },
-            {
-              icon: 'XV',
-              label: 'XV Glam',
-              title: 'Quinceañeras',
-              text: 'Looks glamorosos, juveniles y delicados para brillar con una imagen inolvidable.',
-              footer: 'Glamour moderno',
-              special: true,
-            },
-            {
-              icon: 'M',
-              label: 'Hair and Makeup',
-              title: 'Maquillaje',
-              text: 'Técnicas profesionales para una piel luminosa y un acabado impecable de alto nivel.',
-              footer: 'Acabado premium',
-              special: false,
-            },
-          ].map((item, index) => (
+          {services.map((item, index) => (
             <motion.div
               key={index}
               variants={fadeUp}
@@ -575,13 +978,12 @@ function App() {
           custom={0.1}
           className="mb-14 max-w-3xl"
         >
-          <p className="text-xs uppercase tracking-[0.35em] text-[#c6a664]">Galería</p>
+          <p className="text-xs uppercase tracking-[0.35em] text-[#c6a664]">{t.gallerySection.badge}</p>
           <h3 className="mt-4 text-4xl font-semibold text-[#fff8f0] md:text-5xl">
-            Inspiración visual para novias y quinceañeras.
+            {t.gallerySection.title}
           </h3>
           <p className="mt-6 leading-8 text-[#d5c9b8]">
-            Una selección de estilos, peinados y momentos que reflejan la esencia elegante,
-            femenina y glamorosa de la marca.
+            {t.gallerySection.text}
           </p>
         </motion.div>
 
@@ -649,20 +1051,19 @@ function App() {
             <div className="flex items-center p-8 md:p-10">
               <div>
                 <p className="text-xs uppercase tracking-[0.35em] text-[#c6a664]">
-                  Hair and Makeup Artist
+                  {t.gallerySection.ctaBadge}
                 </p>
                 <h3 className="mt-4 text-3xl font-semibold text-[#fff8f0] md:text-4xl">
-                  Maquillaje y peinados profesionales con acabado premium.
+                  {t.gallerySection.ctaTitle}
                 </h3>
                 <p className="mt-6 leading-8 text-[#d5c9b8]">
-                  Un estilo diseñado para proyectar glamour, elegancia y seguridad en cada
-                  evento especial.
+                  {t.gallerySection.ctaText}
                 </p>
                 <a
                   href="#contacto"
                   className="mt-8 inline-flex rounded-full border border-[#c6a664] px-6 py-3 text-sm font-medium text-[#f8f2ea] transition duration-300 hover:bg-[#c6a664] hover:text-black"
                 >
-                  Agenda tu cita
+                  {t.gallerySection.ctaButton}
                 </a>
               </div>
             </div>
@@ -679,13 +1080,12 @@ function App() {
           custom={0.1}
           className="mb-14 max-w-3xl"
         >
-          <p className="text-xs uppercase tracking-[0.35em] text-[#c6a664]">Paquetes</p>
+          <p className="text-xs uppercase tracking-[0.35em] text-[#c6a664]">{t.packagesSection.badge}</p>
           <h3 className="mt-4 text-4xl font-semibold text-[#fff8f0] md:text-5xl">
-            Elige la experiencia perfecta para tu evento.
+            {t.packagesSection.title}
           </h3>
           <p className="mt-6 leading-8 text-[#d5c9b8]">
-            Diseñamos cada paquete para que disfrutes un look sofisticado, femenino y
-            duradero, pensado para resaltar tu belleza en cada momento especial.
+            {t.packagesSection.text}
           </p>
         </motion.div>
 
@@ -699,7 +1099,7 @@ function App() {
               viewport={{ once: true, amount: 0.25 }}
               custom={0.12 + index * 0.12}
               className={`rounded-[34px] border p-8 transition duration-300 hover:-translate-y-2 ${
-                pkg.highlighted
+                ('highlighted' in pkg && pkg.highlighted)
                   ? 'border-[#c6a664]/35 bg-[linear-gradient(180deg,rgba(198,166,100,0.14),rgba(255,255,255,0.04))] shadow-[0_15px_50px_rgba(198,166,100,0.12)]'
                   : 'border-[#c6a664]/15 bg-white/[0.03] hover:border-[#c6a664]/30 hover:shadow-[0_15px_45px_rgba(198,166,100,0.06)]'
               }`}
@@ -736,7 +1136,7 @@ function App() {
                 href="#contacto"
                 className="mt-8 inline-flex rounded-full border border-[#c6a664] px-5 py-3 text-sm font-medium text-[#f8f2ea] transition duration-300 hover:bg-[#c6a664] hover:text-black"
               >
-                Reservar paquete
+                {t.packagesSection.reserve}
               </a>
             </motion.div>
           ))}
@@ -751,9 +1151,7 @@ function App() {
           className="mt-10 rounded-[28px] border border-[#c6a664]/20 bg-[#c6a664]/[0.06] px-6 py-5"
         >
           <p className="text-sm leading-7 text-[#f2e7d8] md:text-base">
-            <span className="font-semibold text-[#c6a664]">Nota importante:</span> Los precios
-            mostrados <span className="font-semibold">no incluyen gastos de transporte ni parking</span>{' '}
-            en caso de ser requeridos. Estos costos se cotizan por separado según la ubicación del evento.
+            {t.packagesSection.note}
           </p>
         </motion.div>
 
@@ -766,8 +1164,7 @@ function App() {
           className="mt-12 rounded-[30px] border border-[#c6a664]/15 bg-white/[0.03] px-6 py-6 text-center"
         >
           <p className="text-base leading-8 text-[#e8ddce] md:text-lg">
-            ✨ Haz que cada momento brille. Agenda tu cita hoy y luce espectacular en
-            tu evento especial. ✨
+            {t.packagesSection.finalText}
           </p>
         </motion.div>
       </section>
@@ -782,19 +1179,18 @@ function App() {
             custom={0.1}
             className="rounded-[36px] border border-[#c6a664]/15 bg-white/[0.03] p-8 shadow-[0_15px_55px_rgba(0,0,0,0.25)] md:p-10"
           >
-            <p className="text-xs uppercase tracking-[0.35em] text-[#c6a664]">Contacto</p>
+            <p className="text-xs uppercase tracking-[0.35em] text-[#c6a664]">{t.contact.badge}</p>
             <h3 className="mt-4 text-4xl font-semibold text-[#fff8f0] md:text-5xl">
-              Reserva tu fecha y haz que tu imagen también sea protagonista.
+              {t.contact.title}
             </h3>
 
             <p className="mt-6 leading-8 text-[#d4c8b7]">
-              Contáctanos directamente por WhatsApp, llamada o redes sociales para cotizar tu evento,
-              revisar disponibilidad y apartar tu fecha.
+              {t.contact.text}
             </p>
 
             <div className="mt-10 space-y-5 text-[#f6efe7]">
               <div className="rounded-2xl border border-[#c6a664]/12 bg-black/20 px-5 py-4 transition duration-300 hover:border-[#c6a664]/30">
-                <span className="text-[#c6a664]">Ubicación:</span> 2202 E Charleston Blvd, Las Vegas, NV, United States, 89104
+                <span className="text-[#c6a664]">{t.contact.location}</span> 2202 E Charleston Blvd, Las Vegas, NV, United States, 89104
               </div>
 
               <a
@@ -805,7 +1201,7 @@ function App() {
               >
                 <Instagram size={18} className="text-[#c6a664]" />
                 <span>
-                  <span className="text-[#c6a664]">Instagram:</span> @bridexvglam
+                  <span className="text-[#c6a664]">{t.contact.instagram}</span> @bridexvglam
                 </span>
               </a>
 
@@ -817,20 +1213,20 @@ function App() {
               >
                 <Facebook size={18} className="text-[#c6a664]" />
                 <span>
-                  <span className="text-[#c6a664]">Facebook:</span> Bride XV Glam
+                  <span className="text-[#c6a664]">{t.contact.facebook}</span> Bride XV Glam
                 </span>
               </a>
 
               <div className="rounded-2xl border border-[#c6a664]/12 bg-black/20 px-5 py-4 transition duration-300 hover:border-[#c6a664]/30">
-                <span className="text-[#c6a664]">WhatsApp:</span> +1 (702) 582-3041
+                <span className="text-[#c6a664]">{t.contact.whatsapp}</span> +1 (702) 582-3041
               </div>
 
               <div className="rounded-2xl border border-[#c6a664]/12 bg-black/20 px-5 py-4 transition duration-300 hover:border-[#c6a664]/30">
-                <span className="text-[#c6a664]">Llamadas:</span> +1 (702) 582-3041
+                <span className="text-[#c6a664]">{t.contact.calls}</span> +1 (702) 582-3041
               </div>
 
               <div className="rounded-2xl border border-[#c6a664]/12 bg-black/20 px-5 py-4 transition duration-300 hover:border-[#c6a664]/30">
-                <span className="text-[#c6a664]">Importante:</span> No incluye gastos de transporte ni parking en caso de ser requeridos.
+                <span className="text-[#c6a664]">{t.contact.important}</span> {t.contact.importantText}
               </div>
             </div>
           </motion.div>
@@ -845,13 +1241,13 @@ function App() {
           >
             <div className="mb-8">
               <p className="text-xs uppercase tracking-[0.35em] text-[#c6a664]">
-                Solicita información
+                {t.contact.cardBadge}
               </p>
               <h4 className="mt-4 text-3xl font-semibold text-[#fff8f0]">
-                Habla con nosotros directamente
+                {t.contact.cardTitle}
               </h4>
               <p className="mt-5 leading-8 text-[#d4c8b7]">
-                Elige la forma de contacto que prefieras para recibir atención más rápida.
+                {t.contact.cardText}
               </p>
             </div>
 
@@ -863,7 +1259,7 @@ function App() {
                 className="flex items-center justify-center gap-3 rounded-full bg-[#c6a664] px-6 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-black shadow-[0_12px_30px_rgba(198,166,100,0.25)] transition duration-300 hover:scale-[1.02] hover:bg-[#ffd700]"
               >
                 <MessageCircle size={18} />
-                Enviar mensaje por WhatsApp
+                {t.contact.whatsappButton}
               </a>
 
               <a
@@ -871,7 +1267,7 @@ function App() {
                 className="flex items-center justify-center gap-3 rounded-full border border-[#c6a664] px-6 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-[#f8f2ea] transition duration-300 hover:scale-[1.02] hover:bg-[#c6a664] hover:text-black"
               >
                 <Phone size={18} />
-                Hacer una llamada
+                {t.contact.callButton}
               </a>
 
               <div className="grid grid-cols-2 gap-4">
@@ -899,11 +1295,10 @@ function App() {
 
             <div className="mt-8 rounded-[28px] border border-[#c6a664]/12 bg-black/20 p-6">
               <p className="text-sm uppercase tracking-[0.24em] text-[#c6a664]">
-                Atención directa
+                {t.contact.directBadge}
               </p>
               <p className="mt-4 text-lg leading-8 text-[#eadfcf]">
-                Agenda tu cita, consulta paquetes y confirma disponibilidad de forma rápida
-                por WhatsApp, llamada o redes sociales.
+                {t.contact.directText}
               </p>
             </div>
           </motion.div>
@@ -917,7 +1312,7 @@ function App() {
               Luz Cervantes
             </p>
             <p className="text-xs uppercase tracking-[0.22em] text-[#c6a664]">
-              Hair and Makeup Artist
+              {t.footer.role}
             </p>
           </div>
 
@@ -941,7 +1336,7 @@ function App() {
             </a>
           </div>
 
-          <p className="text-sm text-[#cbbfae]">© 2026 Todos los derechos reservados.</p>
+          <p className="text-sm text-[#cbbfae]">{t.footer.rights}</p>
         </div>
       </footer>
     </div>
